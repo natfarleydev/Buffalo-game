@@ -1,0 +1,3 @@
+	add(piece_image);
+	piece_image.show();
+

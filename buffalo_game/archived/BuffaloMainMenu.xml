@@ -1,0 +1,11 @@
+<ui>
+	<menubar name="MainMenu">
+		<menu name="FileMenu" action="FileMenuAction">
+			<menuitem name="New Game" action="NewGame" />
+			<menuitem name="Quit" action="QuitBuffalo" />
+		</menu>
+		<menu name="HelpMenu" action="HelpMenuAction">
+			<menuitem name="About" action="AboutBuffalo" />
+		</menu>
+	</menubar>
+</ui>

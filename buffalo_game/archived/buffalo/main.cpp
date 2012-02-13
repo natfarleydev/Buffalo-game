@@ -1,0 +1,100 @@
+#include <gtk/gtk.h>
+
+void newGame() {
+	g_print("This will make a new game.");
+}
+
+void aboutBuffalo() {
+	g_print("This will be the about function");
+}
+
+void quitBuffalo() {
+	gtk_main_quit();
+}
+
+GtkActionEntry menuentries[] = {
+	{ "FileMenuAction", NULL, "_File" },
+	{ "HelpMenuAction", NULL, "_Help" },
+
+	// Important to remember here, the functions in the xml are upper-
+	// case first, and the proper functions are lowercase first
+	{ "NewGame", NULL, "_New Game", "<control>N", "Start a new game", G_CALLBACK(newGame) },
+	{ "QuitBuffalo", NULL, "_Quit", "<control>Q", "Quit", G_CALLBACK(quitBuffalo) },
+	{ "AboutBuffalo", NULL, "_About", "<control>H", "Start a new game", G_CALLBACK(aboutBuffalo) },
+};
+
+guint nentries = G_N_ELEMENTS(menuentries);
+
+int main(int argc, char** argv) {
+	GtkWidget * window;
+	GtkWidget * menubox;
+	GtkActionGroup * actiongroup;
+	GtkUIManager * menumanager;
+	GError * error;
+	GtkWidget * menubar;
+
+	// Not a good idea to start gtk without this line
+	// In fact, I'm not sure if it starts without it.
+	gtk_init(&argc, &argv);
+
+	// Make the main window
+	// TOPLEVEL means that the window manager deals with it
+	window  = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW(window), "Buffalo");
+	gtk_window_set_default_size(GTK_WINDOW(window), 900, 600);
+	
+	// The menubox, the place to pack the menu
+	menubox = gtk_vbox_new(FALSE, 0); // Really should look that FALSE up later
+	
+	// As everything in gtk does, actions need a box too
+	actiongroup = gtk_action_group_new("MainActions");
+
+	// Not sure what this does yet...
+	// Maybe it'll be obvious when I have to refer to it later
+	// Named reservation after indian reservations
+	gtk_action_group_set_translation_domain(actiongroup, "reservation");
+
+	menumanager = gtk_ui_manager_new(); // This shows by itself
+
+	gtk_container_add(GTK_CONTAINER(window), menubox);
+	// I need to understand the next two entries thoroughly before I 
+	// hand in my report. I don't know how much of the report I will
+	// have to take explaining the procedure.
+	gtk_action_group_add_actions(actiongroup, menuentries, nentries, NULL);
+	gtk_ui_manager_insert_action_group(menumanager, actiongroup, 0);
+
+	// No errors! I certainly don't want random errors showing from
+	// unassigned memory
+	error = NULL;
+
+	// Load the XML file
+	gtk_ui_manager_add_ui_from_file(menumanager, "BuffaloMainMenu.xml", &error);
+
+	// Output errors loading the xml file, if any.
+	if(error) {
+		g_message ("The menu failed. Gtk says: %s", error->message);
+		g_error_free(error);
+	}
+
+	// Connect the quit signal. I don't know why gtk doesn't just 
+	// have this as the default. Maybe GTK3 does.
+	g_signal_connect(window, "destroy", G_CALLBACK(quitBuffalo),NULL);
+
+	// Time to pack the menubar
+	menubar = gtk_ui_manager_get_widget(menumanager, "/MainMenu");
+	gtk_box_pack_start(GTK_BOX(menubox), menubar, FALSE, FALSE, 0);
+
+	// The notes on the example say, 'Make sure that the accelerators work'
+	// What?!
+	gtk_window_add_accel_group(GTK_WINDOW(window),gtk_ui_manager_get_accel_group(menumanager));
+
+	// show_all is new!
+	gtk_widget_show_all(window);
+
+	// THE moment of a gui program.
+	gtk_main();
+
+	return 0;
+
+}
+

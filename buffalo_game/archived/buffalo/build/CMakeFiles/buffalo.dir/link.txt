@@ -1,0 +1,1 @@
+/usr/bin/c++   -g   CMakeFiles/buffalo.dir/main.cpp.o  -o buffalo -rdynamic 
